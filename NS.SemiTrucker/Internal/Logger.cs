@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace NS.Common.Internal
+namespace NS.SemiTrucker.Internal
 {
     using System;
     using System.IO;

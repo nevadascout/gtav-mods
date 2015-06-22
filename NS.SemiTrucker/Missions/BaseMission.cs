@@ -13,6 +13,8 @@ namespace NS.SemiTrucker.Missions
     using GTA.Math;
     using GTA.Native;
 
+    using NS.SemiTrucker.Internal;
+
     public class BaseMission
     {
         public Vehicle Truck { get; set; }
@@ -33,8 +35,9 @@ namespace NS.SemiTrucker.Missions
         public void Start()
         {
             // TODO -- Add logger here
+            Logger.Log("Starting semi-truck mission");
 
-            Game.FadeScreenOut(1000);
+            Game.FadeScreenOut(3000);
             Game.Player.CanControlCharacter = false;
 
             // Spawn a trailer at each objective
@@ -56,10 +59,11 @@ namespace NS.SemiTrucker.Missions
             var truckBlip = this.Truck.AddBlip();
             truckBlip.ShowRoute = true;
 
-            // Show an objective hint
-            UI.ShowSubtitle("Get in the truck", 6000);
+            Game.FadeScreenIn(3000);
 
-            Game.FadeScreenIn(1000);
+            // Show an objective hint
+            UI.ShowSubtitle("Get in the truck", 10000);
+
             Game.Player.CanControlCharacter = true;
         }
     }

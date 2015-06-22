@@ -13,7 +13,7 @@ namespace NS.SemiTrucker
     using GTA;
     using GTA.Math;
 
-    using NS.Common.Internal;
+    using NS.SemiTrucker.Internal;
 
     using Control = GTA.Control;
 
@@ -23,7 +23,7 @@ namespace NS.SemiTrucker
 
         private CruiseControl cruiseControl;
 
-        private Vector3 truckerMissionStartPoint = new Vector3(1f, 1f, 1f);
+        private Vector3 truckerMissionStartPoint = new Vector3(1715.841f, -1590.368f, 112.1237f);
 
         private Blip truckerMissionStartPointBlip;
 
@@ -37,6 +37,9 @@ namespace NS.SemiTrucker
             this.cruiseControl = new CruiseControl();
 
             Logger.Log("STARTING NS.SEMITRUCKER MOD");
+
+            // Show the trucker mission start checkpoint + map blip
+            this.truckerMissionStartPointBlip = World.CreateBlip(this.truckerMissionStartPoint);
         }
 
         public void OnTick(object sender, EventArgs e)
@@ -45,7 +48,6 @@ namespace NS.SemiTrucker
             
             if (this.cruiseControl == null) this.cruiseControl = new CruiseControl();
             
-
             if (this.missionRunner.MissionIsRunning)
             {
                 this.missionRunner.Run();
@@ -59,9 +61,8 @@ namespace NS.SemiTrucker
             // Start mission if the player is at the start point + not currently on a mission
             if (player.CanStartMission && !this.missionRunner.MissionIsRunning)
             {
-
                 // Show the trucker mission start checkpoint + map blip
-                this.truckerMissionStartPointBlip = World.CreateBlip(this.truckerMissionStartPoint);
+                //this.truckerMissionStartPointBlip = World.CreateBlip(this.truckerMissionStartPoint);
                 //this.truckerMissionStartPointBlip.Sprite = BlipSprite.ArmoredTruck;
 
 
@@ -73,12 +74,15 @@ namespace NS.SemiTrucker
             }
 
             // Set vehicle speed if cruise control is enabled
-            this.cruiseControl.SetSpeed();
-            
-            // Disable cruise control if the player presses the brake or speeds up
-            if (PlayerIsChangingVehicleSpeed())
+            if (Game.Player.Character.IsInVehicle())
             {
-                this.cruiseControl.Disable();
+                this.cruiseControl.SetSpeed();
+
+                // Disable cruise control if the player presses the brake or speeds up
+                if (PlayerIsChangingVehicleSpeed() && this.cruiseControl.IsActive)
+                {
+                    this.cruiseControl.Disable();
+                }
             }
         }
 

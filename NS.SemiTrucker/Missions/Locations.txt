@@ -1,0 +1,49 @@
+﻿
+Truck Depot (El Burro Heights)
+
+	Mission Start Point:	Vector3(1715.841f, -1590.368f, 112.1237f)
+	Truck Spawn:			Vector3(1730.482f, -1555.9f, 112.2797f)			80.61585f heading
+	Trailer Spawn:			Vector3(1737.056f, -1535.493f, 112.298f)		247.2201f heading
+	Mission Destination:	
+ 
+
+Saw Mill (Paleto Bay)
+
+	Truck Spawn:			
+	Trailer Spawn:			Vector3(-576.3062f, 5373.465f, 70.51006f)		274.3176f heading
+	Mission Destination:	Vector3(1204.871f, -1313.668f, 35.46343f)
+
+
+Lumber Yard (Lesters Warehouse)
+
+	Truck Spawn:			
+	Trailer Spawn:			Vector3(1208.745f, -1250.429f, 35.46101f)		179.8779f heading
+	Mission Destination:	Vector3(1204.871f, -1313.668f, 35.46343f)
+
+
+LS Docks (Main Terminal)
+
+LS Docks (Near Simeon)
+
+LS Docks (Near Bugstar)
+
+LS Docks (MerryWeather)
+
+Windfarm
+
+Sandy Shores Airfield
+
+Sandy Shores Strip Mall
+
+Fort Zancudo
+
+Cluckin' Bell Factory
+
+Slaughterhouse
+
+Oil Refinery (Near Windfarm)
+
+Construction Site
+
+
+Various Gas Stations

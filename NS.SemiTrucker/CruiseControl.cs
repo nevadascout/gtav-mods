@@ -17,7 +17,8 @@ namespace NS.SemiTrucker
 
         public void SetSpeed()
         {
-            if (this.IsActive)
+            // TODO -- Allow speed to slow down if vehicle wheels are not on the ground
+            if (this.IsActive) // && Game.Player.Character.CurrentVehicle.IsOnAllWheels
             {
                 Game.Player.Character.CurrentVehicle.Speed = this.speed;
             }
