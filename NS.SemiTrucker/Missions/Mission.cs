@@ -5,10 +5,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace NS.SemiTrucker.MissionEngine
+namespace NS.SemiTrucker.Missions
 {
     public enum Mission
     {
-        None
+        None,
+
+        // Mission Overview:
+        // 1. Take container to sawmill in Paleto Bay
+        // 2. Take logs to lumber yard next to Lester's warehouse
+        Timber
     }
 }

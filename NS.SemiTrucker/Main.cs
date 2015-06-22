@@ -8,92 +8,131 @@
 namespace NS.SemiTrucker
 {
     using System;
-    using System.Linq;
+    using System.Windows.Forms;
 
     using GTA;
     using GTA.Math;
 
-    using NS.SemiTrucker.MissionEngine;
+    using NS.Common.Internal;
+
+    using Control = GTA.Control;
 
     public class Main : Script
     {
-        private readonly Ped playerPed = Game.Player.Character;
+        private MissionRunner missionRunner;
 
-        private Mission activeMission = Mission.None;
+        private CruiseControl cruiseControl;
 
-        private bool playerIsOnMission;
+        private Vector3 truckerMissionStartPoint = new Vector3(1f, 1f, 1f);
+
+        private Blip truckerMissionStartPointBlip;
 
 
         public Main()
         {
-            this.Tick += this.onTick;
+            this.Tick += this.OnTick;
+            this.KeyDown += this.OnKeyDown;
+
+            this.missionRunner = new MissionRunner(debugMode: true);
+            this.cruiseControl = new CruiseControl();
+
+            Logger.Log("STARTING NS.SEMITRUCKER MOD");
         }
 
-        private void onTick(object sender, EventArgs e)
+        public void OnTick(object sender, EventArgs e)
         {
-            if (this.playerIsOnMission)
-            {
-                this.RunMission();
-            }
-            else
-            {
-                // Check if player has moved into our checkpoint marker
-                if (this.playerPed.Position == Vector3.RelativeBack && !this.playerIsOnMission)
-                {
-                    UI.Notify("Walk out of the checkpoint to cancel starting a trucking mission");
-
-                    Script.Wait(1500);
-
-                    // TODO -- Check position again
-                    // If the player is still in the checkpoint, start a trucking mission
-                    this.StartRandomMission();
-                }
-
-                if (this.playerPed.Position == Vector3.RelativeBack && this.playerIsOnMission)
-                {
-                    this.EndCurrentMission();
-                }
-            }
-        }
-
-
-        private void RunMission()
-        {
-
-        }
-
-        private void StartRandomMission()
-        {
-            this.playerIsOnMission = true;
-            this.activeMission = this.GetRandomMission();
-
-            // if(Game.Player.CanStartMission)
+            if (this.missionRunner == null) this.missionRunner = new MissionRunner(debugMode: true);
             
-            // Fade screen to black, then
-            // Spawn truck + trailer (?)
-            // Place location marker w/ route
+            if (this.cruiseControl == null) this.cruiseControl = new CruiseControl();
+            
+
+            if (this.missionRunner.MissionIsRunning)
+            {
+                this.missionRunner.Run();
+            }
+
+            var player = Game.Player;
+
+            // TODO -- Create a mission menu to allow the player to pick a mission to play (?)
+            // TODO -- Store played missions this session so a player doesn't get the same mission twice in one game session (?)
+
+            // Start mission if the player is at the start point + not currently on a mission
+            if (player.CanStartMission && !this.missionRunner.MissionIsRunning)
+            {
+
+                // Show the trucker mission start checkpoint + map blip
+                this.truckerMissionStartPointBlip = World.CreateBlip(this.truckerMissionStartPoint);
+                //this.truckerMissionStartPointBlip.Sprite = BlipSprite.ArmoredTruck;
+
+
+                // Start a mission if the player walks into the start point marker
+                if (player.Character.Position.DistanceTo(this.truckerMissionStartPoint) <= 1)
+                {
+                    this.missionRunner.Start();
+                }
+            }
+
+            // Set vehicle speed if cruise control is enabled
+            this.cruiseControl.SetSpeed();
+            
+            // Disable cruise control if the player presses the brake or speeds up
+            if (PlayerIsChangingVehicleSpeed())
+            {
+                this.cruiseControl.Disable();
+            }
         }
 
-        private void EndCurrentMission()
+        public void OnKeyDown(object sender, KeyEventArgs e)
         {
-            this.playerIsOnMission = false;
-            this.activeMission = Mission.None;
+            // Enable cruise control + set it to the current vehicle speed
+            if (e.KeyCode == Keys.Multiply)
+            {
+                Logger.Log("Enable cruise control");
+                this.cruiseControl.Enable();
+            }
 
-            // Do Cleanup (?)
+            // Enable cruise control + set it to the last stored speed
+            if (e.KeyCode == Keys.Divide)
+            {
+                Logger.Log("Enable cruise control - last speed");
+                this.cruiseControl.Enable(useLastSpeed: true);
+            }
+
+            if (e.KeyCode == Keys.Add)
+            {
+                this.cruiseControl.IncreaseSpeed();
+            }
+
+            if (e.KeyCode == Keys.Subtract)
+            {
+                this.cruiseControl.DecreaseSpeed();
+            }
+
+            if (e.KeyCode == Keys.F5)
+            {
+                UI.Notify("Saving location player + heading");
+                Logger.Log("POS:" + Game.Player.Character.CurrentVehicle.Position + " HEADING: " + Game.Player.Character.CurrentVehicle.Heading);
+            }
         }
 
-        private Mission GetRandomMission()
+        private static bool PlayerIsChangingVehicleSpeed()
         {
-            var mission = Enum.GetValues(typeof(Mission)).Cast<Mission>().OrderBy(e => Guid.NewGuid()).First();
+            if (Game.IsControlPressed(0, Control.VehicleBrake))
+            {
+                return true;
+            }
 
-            if (mission == Mission.None)
+            if (Game.IsControlPressed(0, Control.VehicleHandbrake))
             {
-                this.GetRandomMission();
+                return true;
             }
-            else
+
+            if (Game.IsControlPressed(0, Control.VehicleAccelerate))
             {
-                return mission;
+                return true;
             }
+
+            return false;
         }
     }
 }
